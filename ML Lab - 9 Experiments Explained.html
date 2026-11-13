@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="utf-8"><title>ML Lab - 9 Experiments Explained</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#fff;--fg:#1c1c1e;--mut:#666;--card:#f4f5f7;--acc:#2563eb;--code:#0f172a;--cf:#e2e8f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111317;--fg:#eceef2;--mut:#9aa0ab;--card:#1b1e25;--acc:#6ea0ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,sans-serif}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px;position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--card)}
+nav a{padding:6px 12px;border-radius:8px;background:var(--card);color:var(--fg);text-decoration:none;white-space:nowrap}
+nav a.on{background:var(--acc);color:#fff}
+main{max-width:900px;margin:auto;padding:14px}
+h1{font-size:20px;margin:6px 0}.aim,.box{background:var(--card);border-radius:10px;padding:10px 12px;margin:10px 0}
+.row{margin:12px 0;border:1px solid var(--card);border-radius:10px;overflow:hidden}
+pre{margin:0;padding:10px;background:var(--code);color:var(--cf);overflow-x:auto;font:13px/1.45 ui-monospace,monospace}
+.ex{padding:8px 12px}.ex b{color:var(--acc)}h2{font-size:16px;margin:18px 0 4px}
+</style></head><body>
+<nav id="nav"></nav><main id="m"></main>
+<script>
+const E=[
+{t:"Exp 1: Matplotlib basics",aim:"Simple chart banana, plot ki properties set karna, Matplotlib + NumPy saath use karna.",
+sum:"Matplotlib = graph banane ki library. NumPy = numbers ke arrays aur fast maths. 3 programs: (1) simple line chart, (2) styling, (3) NumPy se data bana ke plot.",
+s:[
+["import matplotlib.pyplot as plt","Matplotlib ka pyplot module laya, plt short naam hai. Har graph command plt. se shuru."],
+["months=['Jan',...,'Dec']\nrainfall_mm=[1.5,1.1,...]","X-axis ke liye mahine, Y-axis ke liye Mumbai ki barish (mm). Dono lists ki length same (12) honi chahiye."],
+["plt.figure(figsize=(10,6))","Khali canvas banata hai, 10 inch chauda, 6 inch ucha."],
+["plt.plot(months, rainfall_mm)","Line chart draw karta hai: x = months, y = rainfall."],
+["plt.title(..) plt.xlabel(..) plt.ylabel(..)","Graph ka title aur dono axes ke naam."],
+["plt.grid(True)","Background me grid lines, value padhna easy."],
+["plt.show()","Graph ki window kholta hai (zoom/pan buttons ke saath = interactive). Iske bina graph dikhta nahi."],
+["fig, ax = plt.subplots(figsize=(12,7))","P2: fig = poora canvas, ax = uske andar ka actual graph. ax se zyada control milta hai."],
+["ax.plot(months, avg_high_c, color='red', linestyle='--', linewidth=2, marker='o', label='...')","Line ki properties: color red, dashed line, motai 2, har point par circle. label legend me dikhega."],
+["ax.plot(... color='blue', linestyle='-', marker='x' ...)","Low temperature ki doosri line: blue, solid, x marker."],
+["ax.set_title(..., fontsize=16, fontweight='bold')","Title ka size aur bold. set_xlabel/set_ylabel axes ke naam."],
+["ax.set_facecolor('#f0f0f0')","Plot area ka background grey."],
+["ax.grid(True, linestyle=':', color='gray', alpha=0.6)","Dotted grey grid. alpha = transparency (0 invisible, 1 solid)."],
+["ax.legend(fontsize='medium')","Label wale box dikhata hai, kaun si line kya hai."],
+["years = np.arange(2015, 2025)","P3: NumPy array 2015 se 2024 (end 2025 include nahi hota)."],
+["projected_revenue = 50 + (years-2015)*8","Har saal 8 million growth. NumPy poore array par ek saath maths karta hai (vectorization), loop nahi chahiye."],
+["market_noise = np.random.randint(-7, 8, size=len(years))","-7 se +7 tak random integers (8 include nahi), 10 saal ke liye. Real-world uncertainty."],
+["actual_revenue = projected_revenue + market_noise","Dono arrays element-by-element add. Isliye har run me graph alag aata hai."],
+["plt.ylim(bottom=40) / plt.xticks(years)","Y-axis 40 se shuru; X-axis par har saal ka number."]],
+q:["plot() vs show() me fark? plot sirf draw karta hai, show screen par dikhata hai.","fig aur ax kya? fig = canvas, ax = graph area.","np.arange vs range? arange NumPy array deta hai aur float step bhi chalta hai."]},
+{t:"Exp 2: Figures, Axes, Text, Grid, Legend",aim:"Multiple figures/axes, text, grid aur legend use karna.",
+sum:"Ek program me kai figures (alag windows) ya ek figure me kai subplots (chhote graphs) bana sakte hain.",
+s:[
+["fig1, ax1 = plt.subplots()\nax1.plot([1,2,3,4],[1,4,2,3])","Pehli independent figure. plot(x_list, y_list)."],
+["fig2, ax2 = plt.subplots()","Doosri alag figure, alag window."],
+["fig3, axes = plt.subplots(2, 2)","Ek figure me 2x2 = 4 subplots. axes ek 2D array hai."],
+["axes[0,0].plot(...)  axes[0,0].set_title('Subplot 1')","axes[row, column] se subplot choose. [0,0] = upar-left, [1,1] = neeche-right."],
+["fig3.suptitle('Third Figure with Subplots')","Poori figure ka bada title (sup = super)."],
+["plt.tight_layout(rect=[0,0.03,1,0.95])","Subplots overlap na ho, spacing adjust. rect me upar jagah chhodi taaki suptitle na kate."],
+["x = np.linspace(0,10,100); y = np.sin(x)","0 se 10 ke beech 100 barabar doori ke points, unka sine."],
+["ax.text(5, 0.5, 'Data Coordinate Text', fontsize=12, color='red')","Text graph ke data coordinates (x=5, y=0.5) par. Zoom karo to text point ke saath hi chalega."],
+["ax.text(0.1, 0.9, '...', transform=ax.transAxes)","transAxes = axes-relative (0 se 1). (0.1,0.9) = hamesha upar-left ke paas, zoom se fark nahi."],
+["y = np.sin(x) + np.random.rand(50)*0.5","Sine wave + chhota random noise (0 se 0.5)."],
+["ax.grid(True, linestyle='--', alpha=0.6)","Dashed halki grid."],
+["ax.plot(x, y1, label='sin(x)')  ax.legend()","label dena zaroori hai, tabhi legend() un naamon ka box dikhata hai."]],
+q:["subplots(2,2) kya deta hai? 1 figure aur 4 axes ka 2D array.","Data coordinates vs axes coordinates? Pehla data ke saath chalta, doosra axes box ke relative."]},
+{t:"Exp 3: Line, Histogram, Bar, Pie",aim:"Line chart, histogram, bar chart aur pie chart banana.",
+sum:"4 alag chart types. Kab kya: trend = line, distribution = histogram, comparison = bar, hissa/part = pie.",
+s:[
+["ax.plot(x, y)","Line chart: continuous data ka trend (yahan sine wave)."],
+["data = np.random.randn(1000)","1000 random numbers, normal distribution (mean 0, std 1). randn = random normal."],
+["ax.hist(data, bins=30)","Histogram: data ko 30 dibbon (bins) me baantta hai, har dibbe me kitne values (frequency). Bell-curve shape aati hai."],
+["categories=[...]; values=[25,40,30,55]","Bar chart ke liye category naam aur unki values."],
+["ax.bar(categories, values)","Har category ka ek bar, height = value. Categories compare karne ke liye."],
+["sizes=[15,30,45,10]; labels=['Frogs',...]","Pie ke hisse aur naam. Total 100 hai isliye percent seedha."],
+["ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)","autopct = wedge ke andar % dikhao (1 decimal). startangle=90 = pehla slice upar se shuru."],
+["ax.axis('equal')","Aspect ratio barabar, pie gol dikhe, ellipse nahi."]],
+q:["Histogram vs bar chart? Histogram continuous data ki distribution, bar alag categories.","bins kya? Dibbon ki ginti. Kam bins = rough, zyada = detail."]},
+{t:"Exp 4: Linear Regression (House Price)",aim:"Boston dataset se ghar ki keemat (medv) predict karna.",
+sum:"Linear Regression ek seedhi line/plane fit karta hai: price = b0 + b1*crim + b2*rm + ... Model weights seekhta hai jo error kam kare. Result: R2 = 0.666, MSE = 24.5.",
+s:[
+["import kagglehub, pandas as pd","kagglehub = Kaggle se dataset download. pandas = table (DataFrame) handle karne ki library."],
+["dataset_path = kagglehub.dataset_download('puxama/bostoncsv')","Dataset download karke folder ka path deta hai."],
+["df = pd.read_csv(f'{dataset_path}/Boston.csv')","CSV file ko DataFrame me padhta hai. File ka naam exact (capital B) chahiye, isliye pehle os.listdir se check kiya."],
+["print(df.head())","Pehli 5 rows. Columns: crim, rm (kamre), lstat, medv (price in $1000)."],
+["x = df.drop('medv', axis=1)\ny = df['medv']","x = features (inputs), y = target (jo predict karna hai). drop(axis=1) = column hatao. NOTE: code me x likha par aage X use hua, case ka dhyan rakho."],
+["train_test_split(X, y, test_size=0.2, random_state=42)","80% train, 20% test. random_state=42 se har baar same split. Shapes: train 404, test 102."],
+["14 features kyun?","Dataset me 'Unnamed: 0' (row index) column bhi feature ban gaya, isliye 13 ki jagah 14. Viva me bata sakte ho."],
+["model = LinearRegression()\nmodel.fit(X_train, y_train)","Model banaya, fit() = training: weights seekhna."],
+["y_pred = model.predict(X_test)","Unseen test data ki predicted keemat."],
+["mean_squared_error(y_test, y_pred)","MSE = (actual - predicted)^2 ka average. Kam = achha. Yahan 24.49."],
+["r2_score(y_test, y_pred)","R2 = model data ka kitna % variation samjha. 1 best. Yahan 0.666 = 66.6%."],
+["plt.scatter(y_test, y_pred, alpha=0.5)","Actual vs Predicted dots. alpha=0.5 halke dots taaki overlap dikhe."],
+["plt.plot([min,max],[min,max],'k--',lw=2)","Black dashed perfect line (y=x). Dots jitne iske paas, utna achha model."]],
+q:["fit() kya? Training.","Overfitting kya? Model train data ratta maar le par test par fail.","R2 negative ho sakta? Haan, agar model mean se bhi bura ho."]},
+{t:"Exp 5: KNN (Diabetes)",aim:"K-Nearest Neighbour se Pima dataset me diabetes classify karna.",
+sum:"KNN: naya patient aaya to uske sabse paas ke k=5 patients dekho, jo class zyada (majority vote) wahi answer. Koi real training nahi, data yaad rakhta hai (lazy learner). Accuracy 66%.",
+s:[
+["df = pd.read_csv(csv_file_path)","Dataset load. 8 inputs (Glucose, BMI, Age...), target Outcome (1 = diabetes, 0 = nahi)."],
+["print(df.isnull().sum())","Har column me missing values ginta hai. Yahan 0 (par Insulin/Glucose me 0 hi 'missing' ka matlab hai, jo handle nahi kiya)."],
+["X = df.drop('Outcome',axis=1)\ny = df['Outcome']","Features aur label alag."],
+["train_test_split(..., test_size=0.2, random_state=42)","80/20: 614 train, 154 test."],
+["knn = KNeighborsClassifier(n_neighbors=5)","k=5 padosi. Chhota k = noise sensitive, bada k = zyada smooth."],
+["knn.fit(X_train, y_train)","KNN ke liye bas data store karta hai."],
+["accuracy_score","Sahi predictions / total = 0.66."],
+["precision_score","TP/(TP+FP): jisko diabetes bola, usme se kitne sach me the = 0.52."],
+["recall_score","TP/(TP+FN): asli diabetes walon me se kitne pakde = 0.58."],
+["f1_score","Precision aur recall ka balance (harmonic mean) = 0.55."],
+["confusion_matrix(y_test, y_pred)","[[70,29],[23,32]]: 70 sahi 'nahi', 29 galat 'haan' (FP), 23 galat 'nahi' (FN), 32 sahi 'haan' (TP)."],
+["sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')","Matrix ko rang me dikhata hai. annot = numbers likho, fmt='d' = integer."]],
+q:["Accuracy kam kyun? Scaling nahi hui; KNN doori par chalta hai to bade scale wale features (Insulin) dominate karte hain.","KNN ko scaling kyun chahiye? Doori nikalta hai, isliye."]},
+{t:"Exp 6: Naive Bayes (Spam)",aim:"SMS ko spam ya ham classify karna.",
+sum:"Naive Bayes Bayes theorem par chalta hai: P(spam|words) ~ P(words|spam) x P(spam). 'Naive' = maanta hai har word independent hai. Text ko pehle numbers me badalna padta hai (vectorizer).",
+s:[
+["pd.read_csv(csv_file_path, encoding='latin-1')","SMS file me special characters hain, latin-1 se error nahi aata."],
+["df = df[['v1','v2']]\ndf.columns=['label','message']","Sirf kaam ke 2 columns (v1 = label, v2 = text), naam saaf kiye."],
+["df['label'].map({'ham':0,'spam':1})","Text label ko number: ham = 0, spam = 1. (SettingWithCopyWarning sirf chetavni hai, error nahi.)"],
+["vectorizer = CountVectorizer()\nX = vectorizer.fit_transform(df['message'])","Bag of words: har unique word ek column, cell = us word ki ginti. Shape (5572, 8672) = 5572 SMS, 8672 unique words."],
+["train_test_split","80/20: 4457 train, 1115 test."],
+["model = MultinomialNB(); model.fit(...)","Multinomial NB word counts ke liye best. fit = har word ka spam/ham probability seekhna."],
+["precision/recall/f1","Accuracy 97.8%, precision 0.91, recall 0.93. Confusion matrix [[952,13],[11,139]]."],
+["--- 2nd program (TF-IDF) ---","Alag version: TfidfVectorizer(max_features=3000, min_df=2, max_df=0.8) = common/rare words ko kam weight. stratify = train/test me spam ratio same."],
+["cross_val_score(model, X, y, cv=5)","Data 5 hisson me, 5 baar train/test, average score. Zyada bharosemand."],
+["roc_curve / roc_auc_score","ROC = alag thresholds par TPR vs FPR. AUC 1 = perfect."],
+["model.feature_log_prob_[1].argsort()[-10:]","Spam class ke sabse zyada probable 10 words (now, cash, claim, free...)."],
+["100% accuracy kyun?","Online URL fail hua to except wala fallback chala: sirf 4 repeated sentences ke 200 messages. Isliye 100% (real nahi). Faculty puchhe to yehi sach batana."]],
+q:["Naive kyun? Words ko independent maanta hai.","TF-IDF kya? Term Frequency x Inverse Document Frequency: jo word har jagah hai uska weight kam.","Laplace smoothing? alpha=1 default, zero probability se bachata hai."]},
+{t:"Exp 7: Decision Tree (Wine)",aim:"Wine ko 3 types me classify karna.",
+sum:"Decision Tree = sawalon ka tree (flavanoids <= 1.57?). Har node par data aisi feature par todta hai jisse classes sabse saaf alag hon.",
+s:[
+["wine = load_wine()\nX, y = wine.data, wine.target","sklearn ka inbuilt dataset: 178 samples, 13 features, 3 classes (0,1,2)."],
+["train_test_split(..., test_size=0.3, stratify=y)","70/30 split. stratify=y = har class ka ratio train aur test me barabar."],
+["DecisionTreeClassifier(random_state=42)","Default tree: bina limit ke badhta hai. depth 4, 8 leaves, accuracy 96.3%."],
+["cross_val_score(dt_default, X, y, cv=5)","5-fold CV: mean 0.865, yaani asli performance utni achhi nahi jitni ek split dikhata hai."],
+["param_grid = {'criterion':['gini','entropy'], 'max_depth':[3,5,7,10,None], ...}","Try karne ke options. criterion = split quality ka formula. max_depth = tree ki gehrai limit. min_samples_split/leaf = chhote nodes rokne ke liye."],
+["GridSearchCV(..., cv=5, n_jobs=-1)","Sab combinations 5-fold CV se try karta hai. n_jobs=-1 = saare CPU cores."],
+["grid_search.fit(X_train, y_train)","Best params: entropy, depth 3, min_split 5."],
+["dt_optimized = grid_search.best_estimator_","Best model nikala. Test accuracy 90.74%."],
+["feature_importances_","Kaun sa feature kitna kaam aaya: flavanoids 0.41, alcohol 0.34, hue 0.15, proline 0.10, baaki 0."],
+["plot_tree(dt_optimized, feature_names=..., filled=True)","Tree ki tasveer. Rang = class, entropy/gini = impurity (0 = pure)."],
+["Depth vs Accuracy loop","Depth badhane par train accuracy 100% tak jaati hai par test ruk jaata hai = overfitting."],
+["Default optimized se behtar kyun?","CV score best tha (0.886) par ek chhote test set par default 96% aaya. Chhota data hai to aisa hota hai."]],
+q:["Gini vs Entropy? Dono impurity naapte hain, Gini 1-sum(p^2), Entropy -sum(p log p).","Pruning kya? Tree ko chhota karna overfitting rokne ke liye (max_depth jaise)."]},
+{t:"Exp 8: SVM (Diabetes)",aim:"SVM se diabetes classify karna.",
+sum:"SVM do classes ke beech sabse chaudi line (hyperplane) dhundta hai, jisse dono taraf ke closest points (support vectors) ki doori max ho. Kernel trick = non-linear data ko upar ki dimension me le jaana.",
+s:[
+["pd.read_csv(url, names=columns)","Is CSV me header nahi hai, isliye column naam khud diye."],
+["data[feature].replace(0, np.nan)","Glucose, BMI jaise me 0 asambhav hai = missing. Pehle NaN banaya."],
+["fillna(data[feature].median(), inplace=True)","NaN ko median se bhara. Median outliers se safe."],
+["train_test_split(..., stratify=y)","80/20 (614/154), class ratio barabar."],
+["scaler = StandardScaler()\nfit_transform(X_train)\ntransform(X_test)","Har feature mean 0, std 1. SVM doori par chalta hai, scaling zaroori. fit sirf train par (test ki jaankari leak na ho), test par sirf transform."],
+["for kernel in ['linear','rbf','poly','sigmoid']","4 kernels try. linear = seedhi line, rbf = gol curve, poly = polynomial. Best rbf 74%."],
+["max(results, key=lambda x: x[3])","Sabse zyada accuracy wala kernel (lambda = chhota function jo accuracy compare karta hai)."],
+["param_grid = {'C':[...], 'gamma':[...]}","C = galti par kitni saza (bada C = kam errors, overfit risk). gamma = ek point ka asar kitni door tak (rbf)."],
+["GridSearchCV(SVC(), param_grid, cv=5)","Best: C=100, gamma=0.001. CV 0.777."],
+["decision_function(X_test_scaled)","Boundary se signed doori (score). ROC-AUC ke liye probability ki jagah."],
+["roc_auc_score","0.817 = achha class alag karna."],
+["data.corr()['Outcome']","Outcome ke saath correlation: Glucose (0.49) sabse zyada, phir BMI, Age."],
+["Test acc 69% par CV 77%?","Chhota test set (154) hai, isliye numbers upar-neeche hote hain. Dono report karna."]],
+q:["Support vectors? Boundary ke sabse paas ke points.","C ka matlab? Margin vs errors ka balance.","Scaling kyun? Nahi to bade range wala feature doori par haavi."]},
+{t:"Exp 9: ANN (Neural Network)",aim:"Artificial Neural Network: scratch se aur Keras se.",
+sum:"ANN = layers of neurons. Har neuron: weighted sum + bias, fir activation. Forward pass = prediction, backward pass (backpropagation) = error se weights sudharna. Scratch NN fail (47%), Keras NN sahi (97.2%).",
+s:[
+["make_classification(n_samples=1000, n_features=20, ...)","Nakli dataset: 1000 rows, 20 features, 2 classes."],
+["y.reshape(-1,1)","y ko column shape (n,1) me, output layer ke shape se match."],
+["StandardScaler","Features scale. NN ko chhote barabar scale pasand."],
+["__init__: W1 = randn(in,hidden)*0.01; b1 = zeros","Weights chhote random, bias 0. 20 inputs -> 10 hidden -> 1 output."],
+["sigmoid(x) = 1/(1+exp(-x))","Kisi bhi number ko 0 se 1 me dabata hai. clip(-500,500) overflow se bachata hai."],
+["sigmoid_deriv(x) = x*(1-x)","Sigmoid ka derivative (x pehle se sigmoid ka output hai). Backprop ko slope chahiye."],
+["forward: z1 = X@W1+b1; a1=sigmoid(z1); z2=a1@W2+b2; a2=sigmoid(z2)","Input -> hidden -> output. @ = matrix multiplication. a2 = final probability."],
+["backward: out_err = a2 - y; out_delta = out_err * deriv","Output ki galti, aur gradient kitna badalna hai."],
+["hid_delta = (out_delta @ W2.T) * deriv(a1)","Galti ko peeche hidden layer tak bhejna (isi se Backpropagation naam)."],
+["W2 -= lr * (a1.T @ out_delta) / m","Gradient descent: weights ko galti kam karne ki disha me thoda hilao. lr = learning rate, m = samples ka average."],
+["train(): loss = mean((out-y)**2)","MSE loss har epoch. 1 epoch = poora data ek baar. Loss 0.24998 se hila hi nahi."],
+["predict: forward(X) > 0.5","Probability 0.5 se upar = class 1."],
+["Scratch accuracy 47% kyun?","Weights 0.01 (bahut chhote) + sigmoid + MSE = gradient bahut chhota (vanishing gradient). Model sab ko class 1 bolta hai (recall 1.0, confusion matrix ka ek column). Fix: bade weights, lr zyada, epochs zyada, ya ReLU/cross-entropy."],
+["load_digits(); X / 16.0","8x8 images ke 64 pixels (0-16). 16 se baant ke 0-1 normalize."],
+["Sequential([Dense(128,'relu',input_shape=(64,)), Dropout(0.2), Dense(64,'relu'), Dropout(0.2), Dense(32,'relu'), Dense(10,'softmax')])","Layers ka stack. Dense = fully connected. relu = max(0,x). Dropout(0.2) = training me 20% neurons band (overfitting kam). softmax = 10 digits ki probabilities (sum 1)."],
+["model.compile(Adam(0.001), 'sparse_categorical_crossentropy', ['accuracy'])","Adam = smart optimizer. Loss: multi-class ke liye, labels seedhe integers (0-9) ho to 'sparse'."],
+["model.fit(epochs=30, batch_size=32, validation_split=0.2)","30 baar poora data, 32 samples ke batch me weights update. 20% train data validation ke liye alag."],
+["model.evaluate / predict / np.argmax(axis=1)","Test loss, acc. predict 10 probabilities deta hai, argmax sabse badi ka index = predicted digit."],
+["average='weighted'","Multi-class me precision/recall har class ka average, class ke size se weight karke."]],
+q:["Epoch vs batch? Epoch = poora data ek baar, batch = ek update ke liye chhota hissa.","Activation function kyun? Non-linearity, nahi to poora network ek linear model ban jaata.","Backpropagation? Error ko peeche layers me bhej ke weights update."]}
+];
+const nav=document.getElementById('nav'),m=document.getElementById('m');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function show(){let i=(parseInt((location.hash||'#e1').slice(2))||1)-1;if(i<0||i>8)i=0;const e=E[i];
+nav.innerHTML=E.map((x,k)=>`<a href="#e${k+1}" class="${k==i?'on':''}">Exp ${k+1}</a>`).join('');
+m.innerHTML=`<h1>${e.t}</h1><div class="aim"><b>Aim:</b> ${e.aim}</div><div class="box"><b>Simple me:</b> ${e.sum}</div><h2>Code + har line ka matlab</h2>`+
+e.s.map(r=>`<div class="row"><pre>${esc(r[0])}</pre><div class="ex"><b>Matlab:</b> ${r[1]}</div></div>`).join('')+
+`<h2>Viva me ye puchh sakte hain</h2><div class="box">`+e.q.map(q=>`<p>${q}</p>`).join('')+`</div>`;scrollTo(0,0)}
+addEventListener('hashchange',show);show();
+</script></body></html>
